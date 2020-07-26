@@ -14,7 +14,8 @@ const options = {
     maxMax: 500,
     intMin: 50,
     intMax: 200,
-    colors: []
+    colors: [],
+    backgroundColor: "#000000"
 }
 
 const scrollContainer = document.getElementById('scrollContainer')
@@ -108,22 +109,24 @@ function createOptionMenuRangeInput(name, minVar, maxVar) {
     optionMenu.appendChild(inputContainer)
 }
 
-function createOptionMenuColorInput(name) {
+function createOptionMenuColorInput(name, elementType, onChange) {
     const colorInputContainer = document.createElement('div')
     colorInputContainer.className = 'colorInput'
+    colorInputContainer.id = name
 
     const label = document.createElement('div')
-    label.innerHTML = 'Csv Hex Color' 
+    label.innerHTML = camelToTitle(name) 
 
-    const colorInput = document.createElement('textarea')
-    colorInput.rows = 5
-    colorInput.cols = 23
-    colorInput.placeholder = '56a3a6,484538,cad49d,d4eac8,c0d8e0'
-    
-    colorInput.onchange = (e) => {
-        const { value } = e.target
-        options.colors = csvToArr(value)
+    const colorInput = document.createElement(elementType)
+    if (elementType === 'textarea') {
+        colorInput.rows = 5
+        colorInput.cols = 23
+        colorInput.placeholder = '56a3a6,484538,cad49d,d4eac8,c0d8e0'
+    } else {
+        colorInput.placeholder = '56a3a6'
     }
+    
+    colorInput.onkeyup = onChange
 
     colorInputContainer.appendChild(label)
     colorInputContainer.appendChild(colorInput)
@@ -140,11 +143,21 @@ function createOptionMenuClearButton() {
         scrollContainer.innerHTML = ''
     }
 
+    clearButton.style.marginLeft = '3%'
+
     optionMenu.appendChild(clearButton)
 }
 
 createOptionMenuRangeInput('minDiameter', 'minMin', 'minMax')
 createOptionMenuRangeInput('maxDiameter', 'maxMin', 'maxMax')
 createOptionMenuRangeInput('intervalSize', 'intMin', 'intMax')
-createOptionMenuColorInput('color')
+createOptionMenuColorInput('circleColors', 'textarea', (e) => {
+    const { value } = e.target
+    options.colors = csvToArr(value)
+})
+createOptionMenuColorInput('backgroundColor', 'input', (e) => {
+    const { value } = e.target
+    options.backgroundColor = `#${value}`
+    scrollContainer.style.backgroundColor = `#${value}`
+})
 createOptionMenuClearButton()
